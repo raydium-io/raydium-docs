@@ -415,12 +415,24 @@
           "signer": true
         },
         {
-          "name": "authority",
+          "name": "fee_vault_authority",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
+                  99,
+                  114,
+                  101,
+                  97,
+                  116,
+                  111,
+                  114,
+                  95,
+                  102,
+                  101,
+                  101,
+                  95,
                   118,
                   97,
                   117,
@@ -743,12 +755,25 @@
           "signer": true
         },
         {
-          "name": "authority",
+          "name": "fee_vault_authority",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
+                  112,
+                  108,
+                  97,
+                  116,
+                  102,
+                  111,
+                  114,
+                  109,
+                  95,
+                  102,
+                  101,
+                  101,
+                  95,
                   118,
                   97,
                   117,
@@ -1495,8 +1520,7 @@
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "transfer_fee_extension_authority",
-          "optional": true
+          "name": "transfer_fee_extension_authority"
         }
       ],
       "args": [
@@ -4535,10 +4559,10 @@
         "# Fields",
         "* `migrate_nft_info` - The platform configures liquidity info during migration(Only support MigrateType::CPSWAP)",
         "* `fee_rate` - Fee rate of the platform",
-        "* `creator_fee_rate` - The fee rate charged by the creator for each transaction.",
         "* `name` - Name of the platform",
         "* `web` - Website of the platform",
-        "* `img` - Image link of the platform"
+        "* `img` - Image link of the platform",
+        "/// * `creator_fee_rate` - The fee rate charged by the creator for each transaction."
       ],
       "type": {
         "kind": "struct",
@@ -4556,10 +4580,6 @@
             "type": "u64"
           },
           {
-            "name": "creator_fee_rate",
-            "type": "u64"
-          },
-          {
             "name": "name",
             "type": "string"
           },
@@ -4570,6 +4590,10 @@
           {
             "name": "img",
             "type": "string"
+          },
+          {
+            "name": "creator_fee_rate",
+            "type": "u64"
           }
         ]
       }
@@ -4814,14 +4838,28 @@
             "type": "pubkey"
           },
           {
+            "name": "token_program_flag",
+            "docs": [
+              "token program bits",
+              "bit0: base token program flag",
+              "0: spl_token_program",
+              "1: token_program_2022",
+              "",
+              "bit1: quote token program flag",
+              "0: spl_token_program",
+              "1: token_program_2022"
+            ],
+            "type": "u8"
+          },
+          {
             "name": "padding",
             "docs": [
               "padding for future updates"
             ],
             "type": {
               "array": [
-                "u64",
-                8
+                "u8",
+                63
               ]
             }
           }
