@@ -48,7 +48,7 @@
 
     When the platform creates(`create_platform_config` instruction) or updates(`update_platform_config` instrucion) `PlatformConfig` accounts, the `creator_fee_rate` needs to be passed in.
 
-3. Add Option account `transfer_fee_extension_authority` for `create_platform_config` instruction.
+3. Add account `transfer_fee_extension_authority` for `create_platform_config` instruction.
 
     ```rust
     #[derive(Accounts)]
@@ -89,7 +89,7 @@
 
         /// CHECK: If you support the creation of token2022's token and the extension of transferFeeConfig, please set this account.
         #[account()]
-        pub transfer_fee_extension_authority: Option<UncheckedAccount<'info>>,
+        pub transfer_fee_extension_authority: UncheckedAccount<'info>,
     }
     ```
 
