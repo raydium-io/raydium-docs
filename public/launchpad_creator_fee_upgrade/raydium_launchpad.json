@@ -1,5 +1,5 @@
 {
-  "address": "DRay6fNdQ5J82H7xV6uq2aV3mNrUZ1J4PgSKsWgptcm6",
+  "address": "LanMV9sAd7wArD4vJFi2qDdfnVhFxYSUg6eADduJ3uj",
   "metadata": {
     "name": "raydium_launchpad",
     "version": "0.2.0",
@@ -1332,7 +1332,7 @@
           ],
           "writable": true,
           "signer": true,
-          "address": "DRayqG9RXYi8WHgWEmRQGrUWRWbhjYWYkCRJDd6JBBak"
+          "address": "GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ"
         },
         {
           "name": "global_config",
@@ -1925,6 +1925,14 @@
               "name": "VestingParams"
             }
           }
+        },
+        {
+          "name": "amm_fee_on",
+          "type": {
+            "defined": {
+              "name": "AmmFeeOn"
+            }
+          }
         }
       ]
     },
@@ -2201,6 +2209,14 @@
           }
         },
         {
+          "name": "amm_fee_on",
+          "type": {
+            "defined": {
+              "name": "AmmFeeOn"
+            }
+          }
+        },
+        {
           "name": "transfer_fee_extension_param",
           "type": {
             "option": {
@@ -2254,7 +2270,7 @@
         },
         {
           "name": "openbook_program",
-          "address": "EoTcMgcDRTJVZDMZWBoU6rhYHZfkNTVEAfz3uUJRcYGj"
+          "address": "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX"
         },
         {
           "name": "market",
@@ -2310,7 +2326,7 @@
         },
         {
           "name": "amm_program",
-          "address": "DRaya7Kj3aMWQSy19kSjvmuwq9docCHofyP9kanQGaav"
+          "address": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8"
         },
         {
           "name": "amm_pool",
@@ -2855,7 +2871,7 @@
         },
         {
           "name": "cpswap_program",
-          "address": "DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb"
+          "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
         },
         {
           "name": "cpswap_pool",
@@ -3059,8 +3075,39 @@
           }
         },
         {
+          "name": "cpswap_permission_pda",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  101,
+                  114,
+                  109,
+                  105,
+                  115,
+                  115,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "cpswap_program"
+            }
+          }
+        },
+        {
           "name": "lock_program",
-          "address": "DRay25Usp3YJAi7beckgpGUC7mGJ2cR1AVPxhYfwVCUX"
+          "address": "LockrWmn6K5twhz3y9w1dQERbmgSaRkfnTeTKbpofwE"
         },
         {
           "name": "lock_authority",
@@ -3646,7 +3693,7 @@
             "The global config owner or admin"
           ],
           "signer": true,
-          "address": "DRayqG9RXYi8WHgWEmRQGrUWRWbhjYWYkCRJDd6JBBak"
+          "address": "GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ"
         },
         {
           "name": "global_config",
@@ -3737,6 +3784,122 @@
           "type": {
             "defined": {
               "name": "PlatformConfigParam"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_platform_curve_param",
+      "docs": [
+        "Update platform launch param",
+        "# Arguments",
+        "",
+        "* `ctx` - The context of accounts",
+        "* `param` - Parameter to update",
+        ""
+      ],
+      "discriminator": [
+        138,
+        144,
+        138,
+        250,
+        220,
+        128,
+        4,
+        57
+      ],
+      "accounts": [
+        {
+          "name": "platform_admin",
+          "docs": [
+            "The account paying for the initialization costs"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "platform_config",
+          "docs": [
+            "Platform config account to be changed"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  116,
+                  102,
+                  111,
+                  114,
+                  109,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "platform_admin"
+              }
+            ]
+          }
+        },
+        {
+          "name": "global_config",
+          "docs": [
+            "Global configuration account containing protocol-wide settings",
+            "Includes settings like quote token mint and fee parameters"
+          ]
+        },
+        {
+          "name": "quote_mint",
+          "docs": [
+            "The mint for the quote token (token used to buy)",
+            "Must match the quote_mint specified in global config"
+          ],
+          "relations": [
+            "global_config"
+          ]
+        },
+        {
+          "name": "system_program",
+          "docs": [
+            "System program for lamport transfers"
+          ],
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "curve_param",
+          "type": {
+            "defined": {
+              "name": "CurveParams"
+            }
+          }
+        },
+        {
+          "name": "vesting_param",
+          "type": {
+            "defined": {
+              "name": "VestingParams"
+            }
+          }
+        },
+        {
+          "name": "amm_fee_on",
+          "type": {
+            "defined": {
+              "name": "AmmFeeOn"
             }
           }
         }
@@ -3954,6 +4117,104 @@
     }
   ],
   "types": [
+    {
+      "name": "AmmFeeOn",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "QuoteToken"
+          },
+          {
+            "name": "BothToken"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BondingCurveParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "epoch",
+            "docs": [
+              "The epoch for update interval, 0 means not update"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "curve_type",
+            "docs": [
+              "The curve type, 0: constant, 1: fixed, 2: linear"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "migrate_type",
+            "type": "u8"
+          },
+          {
+            "name": "migrate_cpmm_fee_on",
+            "docs": [
+              "The migrate fee on, 0 means not charge, 1 means fee on the quote token, 2 means fee on both token"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "supply",
+            "docs": [
+              "The supply of the token"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_base_sell",
+            "docs": [
+              "The total base sell of the token"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_quote_fund_raising",
+            "docs": [
+              "The total quote fund raising of the token"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "quote_mint",
+            "docs": [
+              "The quote mint"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "vesting_param",
+            "docs": [
+              "The vesting params"
+            ],
+            "type": {
+              "defined": {
+                "name": "VestingParams"
+              }
+            }
+          },
+          {
+            "name": "padding",
+            "docs": [
+              "padding for future updates"
+            ],
+            "type": {
+              "array": [
+                "u64",
+                50
+              ]
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "ClaimVestedEvent",
       "docs": [
@@ -4430,8 +4691,22 @@
             "type": {
               "array": [
                 "u8",
-                184
+                180
               ]
+            }
+          },
+          {
+            "name": "curve_params",
+            "docs": [
+              "The parameters for launching the pool,",
+              "A curve type and quote mint are only allowed to have one configuration."
+            ],
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "BondingCurveParams"
+                }
+              }
             }
           }
         ]
@@ -4852,6 +5127,17 @@
             "type": "u8"
           },
           {
+            "name": "amm_fee_on",
+            "docs": [
+              "migrate to cpmm fee model"
+            ],
+            "type": {
+              "defined": {
+                "name": "AmmFeeOn"
+              }
+            }
+          },
+          {
             "name": "padding",
             "docs": [
               "padding for future updates"
@@ -4859,7 +5145,7 @@
             "type": {
               "array": [
                 "u8",
-                63
+                62
               ]
             }
           }

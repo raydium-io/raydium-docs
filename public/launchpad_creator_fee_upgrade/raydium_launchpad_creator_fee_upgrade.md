@@ -6,7 +6,7 @@
 
 ## How
 
-1. Add `creator_fee_rate`  and `transfer_fee_extension_auth` fields in `PlatformConfig` account layout;
+1. Add `creator_fee_rate`， `transfer_fee_extension_auth` and `curve_params` fields in `PlatformConfig` account layout;
 
     ```rust
     #[account]
@@ -39,8 +39,33 @@
         /// When initializing mint, `withdraw_withheld_authority` and `transfer_fee_config_authority` both belongs to the contract.
         /// Once the token is migrated to AMM, the authorities will be reset to this value
         pub transfer_fee_extension_auth: Pubkey,
+         /// padding for future updates
+        pub padding: [u8; 180],
+        /// The parameters for launching the pool,
+        /// A curve type and quote mint are only allowed to have one configuration.
+        pub curve_params: Vec<BondingCurveParams>,
+    }
+
+    pub struct BondingCurveParams {
+        /// The epoch for update interval, 0 means not update
+        pub epoch: u64,
+        /// The curve type, 0: constant, 1: fixed, 2: linear
+        pub curve_type: u8,
+        pub migrate_type: u8,
+        /// The migrate fee on, 0 means not charge, 1 means fee on the quote token, 2 means fee on both token
+        pub migrate_cpmm_fee_on: u8,
+        /// The supply of the token
+        pub supply: u64,
+        /// The total base sell of the token
+        pub total_base_sell: u64,
+        /// The total quote fund raising of the token
+        pub total_quote_fund_raising: u64,
+        /// The quote mint
+        pub quote_mint: Pubkey,
+        /// The vesting params
+        pub vesting_param: VestingParams,
         /// padding for future updates
-        pub padding: [u8; 184],
+        pub padding: [u64; 50],
     }
     ```
 
@@ -97,7 +122,9 @@
 
 5. Add `claim_creator_fee` and `claim_platform_fee_from_vault` instructions to support claim fees.
 
-6. Add `initialize_with_token_2022` instruction to initialize token22 base token with `TransferFeeConfig` extension.
+6. Add `initialize_with_token_2022` instruction to initialize token22 base token with `TransferFeeConfig` extension and `AmmFeeOn`, for details, please refer to the IDL.
+
+7. Add  `AmmFeeOn` parameter in `initialize` instruction.
 
 ## What need you to do
 
@@ -143,3 +170,5 @@
     You can refer to the new idl attached to create it.
 
 4. If you want to create token_2022 base token, you can use `initialize_with_token_2022` instruction
+
+5. Update the call to your `initialize` instruction to include the `AmmFeeOn` parameter.
