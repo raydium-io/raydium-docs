@@ -6,7 +6,7 @@
 
 ## How
 
-1. Add `creator_fee_rate`  and `transfer_fee_extension_auth` fields in `PlatformConfig` account layout;
+1. Add `creator_fee_rate`， `transfer_fee_extension_auth` and `curve_params` fields in `PlatformConfig` account layout;
 
     ```rust
     #[account]
@@ -39,16 +39,61 @@
         /// When initializing mint, `withdraw_withheld_authority` and `transfer_fee_config_authority` both belongs to the contract.
         /// Once the token is migrated to AMM, the authorities will be reset to this value
         pub transfer_fee_extension_auth: Pubkey,
+         /// padding for future updates
+        pub padding: [u8; 180],
+        /// The parameters for launching the pool
+        pub curve_params: Vec<PlatformCurveParam>,
+    }
+
+    pub struct PlatformCurveParam {
+        /// The epoch for update interval, 0 means not update
+        pub epoch: u64,
+        /// The curve params index
+        pub index: u8,
+        /// The global config address
+        pub global_config: Pubkey,
+        /// bonding curve param
+        pub bonding_curve_param: BondingCurveParam,
         /// padding for future updates
-        pub padding: [u8; 184],
+        pub padding: [u64; 50],
+    }
+
+
+    pub struct BondingCurveParam {
+        // curve params
+        /// Migrate to AMM or CpSwap, 0: amm， 1: cpswap，
+        /// Neither 0 nor 1: invalid
+        pub migrate_type: u8,
+        /// The migrate fee on, 0 means fee on the quote token, 1 means fee on both token
+        /// Neither 0 nor 1: invalid
+        pub migrate_cpmm_fee_on: u8,
+        /// The supply of the token,
+        /// 0: invalid
+        pub supply: u64,
+        /// The total base sell of the token
+        /// 0: invalid
+        pub total_base_sell: u64,
+        /// The total quote fund raising of the token
+        /// 0: invalid
+        pub total_quote_fund_raising: u64,
+        // vesting params
+        /// total amount of tokens to be unlocked
+        /// u64::MAX: invalid
+        pub total_locked_amount: u64,
+        /// Waiting time in seconds before unlocking after fundraising ends
+        /// u64::MAX: invalid
+        pub cliff_period: u64,
+        /// Unlocking period in seconds
+        /// u64::MAX: invalid
+        pub unlock_period: u64,
     }
     ```
 
-2. Add `creator_fee_rate` field in `PlatformParams` for the `create_platform_config` instruction params data;
+1. Add `creator_fee_rate` field in `PlatformParams` for the `create_platform_config` instruction params data;
 
     When the platform creates(`create_platform_config` instruction) or updates(`update_platform_config` instrucion) `PlatformConfig` accounts, the `creator_fee_rate` needs to be passed in.
 
-3. Add account `transfer_fee_extension_authority` for `create_platform_config` instruction.
+2. Add account `transfer_fee_extension_authority` for `create_platform_config` instruction.
 
     ```rust
     #[derive(Accounts)]
@@ -93,11 +138,17 @@
     }
     ```
 
-4. Add the required accounts(`system_program`, `platform_fee_vault`, `creator_fee_vault`) in `remaining_accounts` with `buy_exact_in`, `buy_exact_out`, `sell_exact_in`, `sell_exact_out` instructions
+3. Add the required accounts(`system_program`, `platform_fee_vault`, `creator_fee_vault`) in `remaining_accounts` with `buy_exact_in`, `buy_exact_out`, `sell_exact_in`, `sell_exact_out` instructions
 
-5. Add `claim_creator_fee` and `claim_platform_fee_from_vault` instructions to support claim fees.
+4. Add `claim_creator_fee` and `claim_platform_fee_from_vault` instructions to support claim fees.
 
-6. Add `initialize_with_token_2022` instruction to initialize token22 base token with `TransferFeeConfig` extension.
+5. Add `initialize_with_token_2022` instruction to initialize token22 base token with `TransferFeeConfig` extension and `AmmFeeOn`, for details, please refer to the IDL.
+
+6. Add `initialize_v2` instruction to initialize spl-token base token, compared to `initialize`, the `AmmFeeOn` parameter has been added to specify the mode of creator fee.
+
+7. Add `update_platform_curve_param` instruction to update/add a Platform `BondingCurveParam`.
+
+8. Add `remove_platform_curve_param` instruction to delate a Platform `BondingCurveParam`.
 
 ## What need you to do
 
@@ -137,9 +188,12 @@
 
     - You can use `update_platform_config` instruction to update the `creator_fee_rate` and `transfer_fee_extension_auth` fields;
     - You can claim platform fees by `claim_creator_fee`(claim fees from `platform_fee` saved `PoolState` is not 0) and `claim_platform_fee_from_vault`(claim from `platform_fee_vault`) instructions;
-
+    - You can add `BondingCurveParam` to restrict the use of all tokens created with your platform config
+  
 3. If you have not created your `PlatformConfig` account
 
     You can refer to the new idl attached to create it.
 
-4. If you want to create token_2022 base token, you can use `initialize_with_token_2022` instruction
+4. If you want to create token_2022 base token, you can use `initialize_with_token_2022` instruction.
+
+5. Quickly integrate the `initializeV2` instruction; After 2025-08-21 13:00:00 UTC, the `initialize` instruction will be deprecated.
